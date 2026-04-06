@@ -108,7 +108,7 @@ class Cube:
             num = random.randint(1, 6)
             match num:
                 case 1:
-                    self,U(1)
+                    self.U(1)
                     scramble += "U "
                 case 2:
                     self.L(1)
