@@ -101,3 +101,27 @@ class Cube:
             cube[5][0], cube[5][3] = self.cube[1][3], self.cube[1][2]
 
             self.cube = copy.deepcopy(cube)
+
+    def scramble(self):
+        scramble = ""
+        for _ in range(20):
+            num = random.randint(1, 6)
+            match num:
+                case 1:
+                    self,U(1)
+                    scramble += "U "
+                case 2:
+                    self.L(1)
+                    scramble += "L "
+                case 3:
+                    self.B(1)
+                    scramble += "B "
+                case 4:
+                    self.D(1)
+                    scramble += "D "
+                case 5:
+                    self.R(1)
+                    scramble += "R "
+                case 6:
+                    self.F(1)
+                    scramble += "F "
