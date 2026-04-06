@@ -1,6 +1,5 @@
 import tkinter as tk
 from cube import *
-import time
 
 cube_class = Cube()
 
@@ -24,14 +23,15 @@ COLOR_MAP = {
 def draw_face(face, start_x, start_y, size):
     size /= 2
     cube_face = cube_class.cube[face].copy()
-    label = ["1", "2", "3", "4"]
-    if face <4:
-        label = label[-(face-1):] + label[:-(face-1)]
+    # label = ["0", "1", "2", "3"]
+    if face < 3:
+        # label = label[-(face-1):] + label[:-(face-1)]
         cube_face = cube_face[-(face-1):] + cube_face[:-(face-1)]
-    else:
-        label = label[-(face - 4):] + label[:-(face - 4)]
-        label = label[::-1]
-        cube_face = cube_face[(face - 4):] + cube_face[:(face - 4)]
+    if face > 4:
+        # label = label[-(face -6):] + label[:-(face -6)]
+        cube_face = cube_face[-(face -6):] + cube_face[:-(face -6)]
+    if face == 3:
+        # label = label[::-1]
         cube_face = cube_face[::-1]
     for i in range(4):
         color = COLOR_MAP[cube_face[i]]
@@ -41,7 +41,8 @@ def draw_face(face, start_x, start_y, size):
         y2 = y1 + size
 
         canvas.create_rectangle(x1, y1, x2, y2, fill=color, outline="black")
-        canvas.create_text(x1+size/2, y1+size/2, text=label[i])
+        # canvas.create_text(x1+size/2, y1+size/2, text=i)
+    canvas.create_rectangle(start_x, start_y, start_x+size*2, start_y+size*2, outline="black", width=3)
 
 
 def draw_cube():
@@ -55,25 +56,90 @@ def draw_cube():
     draw_face(5, size*2, size, size)
     draw_face(6, size, size*2, size)
 
-def U():
-    cube_class.U(1)
-    print(cube_class.cube)
+def refresh():
     draw_cube()
     root.update()
 
-def L():
-    cube_class.L(1)
-    print(cube_class.cube)
-    draw_cube()
-    root.update()
+def U(n):
+    cube_class.U(n)
+    refresh()
+
+def L(n):
+    cube_class.L(n)
+    refresh()
+
+def B(n):
+    cube_class.B(n)
+    refresh()
+
+def D(n):
+    cube_class.D(n)
+    refresh()
+
+def R(n):
+    cube_class.R(n)
+    refresh()
+
+def F(n):
+    cube_class.F(n)
+    refresh()
+
+def scramble():
+    scramble = ""
+    for _ in range(20):
+        num = random.randint(1, 6)
+        match num:
+            case 1:
+                U(1)
+                scramble += "U "
+            case 2:
+                L(1)
+                scramble += "L "
+            case 3:
+                B(1)
+                scramble += "B "
+            case 4:
+                D(1)
+                scramble += "D "
+            case 5:
+                R(1)
+                scramble += "R "
+            case 6:
+                F(1)
+                scramble += "F "
+    print(scramble)
 
 frame = tk.Frame(root)
 frame.pack()
 
-button = tk.Button(frame, text="U", command=U)
+button = tk.Button(frame, text="U", command=lambda: U(1))
 button.grid(column=0, row=0)
-button = tk.Button(frame, text="L", command=L)
+button = tk.Button(frame, text="L", command=lambda: L(1))
+button.grid(column=3, row=0)
+button = tk.Button(frame, text="B", command=lambda: B(1))
+button.grid(column=5, row=0)
+button = tk.Button(frame, text="D", command=lambda: D(1))
+button.grid(column=4, row=0)
+button = tk.Button(frame, text="R", command=lambda: R(1))
 button.grid(column=1, row=0)
+button = tk.Button(frame, text="F", command=lambda: F(1))
+button.grid(column=2, row=0)
+
+button = tk.Button(frame, text="U'", command=lambda: U(3))
+button.grid(column=0, row=1)
+button = tk.Button(frame, text="L'", command=lambda: L(3))
+button.grid(column=3, row=1)
+button = tk.Button(frame, text="B'", command=lambda: B(3))
+button.grid(column=5, row=1)
+button = tk.Button(frame, text="D'", command=lambda: D(3))
+button.grid(column=4, row=1)
+button = tk.Button(frame, text="R'", command=lambda: R(3))
+button.grid(column=1, row=1)
+button = tk.Button(frame, text="F'", command=lambda: F(3))
+button.grid(column=2, row=1)
+
+button = tk.Button(frame, text="scramble", command=scramble)
+button.grid(column=0, row=2)
 
 
 
