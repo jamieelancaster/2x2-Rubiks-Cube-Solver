@@ -61,27 +61,27 @@ def refresh():
     root.update()
 
 def U(n):
-    cube_class.U(n)
+    cube_class.cube = cube_class.U(n, cube_class.cube)
     refresh()
 
 def L(n):
-    cube_class.L(n)
+    cube_class.cube = cube_class.L(n, cube_class.cube)
     refresh()
 
 def B(n):
-    cube_class.B(n)
+    cube_class.cube = cube_class.B(n, cube_class.cube)
     refresh()
 
 def D(n):
-    cube_class.D(n)
+    cube_class.cube = cube_class.D(n, cube_class.cube)
     refresh()
 
 def R(n):
-    cube_class.R(n)
+    cube_class.cube = cube_class.R(n, cube_class.cube)
     refresh()
 
 def F(n):
-    cube_class.F(n)
+    cube_class.cube = cube_class.F(n, cube_class.cube)
     refresh()
 
 def scramble():
