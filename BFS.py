@@ -1,5 +1,6 @@
 from cube import Cube
 from collections import deque
+import time
 
 cube_class = Cube()
 
@@ -55,6 +56,7 @@ def apply_move(state_bytes, move, turns):
     return bytes(state_bytes[perm[i]] for i in range(24))
 
 def bfs():
+    start = time.time()
     buffer = []
     buffer_size = 10000
 
@@ -69,12 +71,12 @@ def bfs():
 
     while queue:
         state, depth, prev_move = queue.popleft()
-        if len(visited) % 10000 == 0:
-            print(
-                f"Depth: {depth}, Queue: {len(queue)}, "
-                f"Visited: {len(visited)}, "
-                f"Completed: {int(100*(len(visited)/3674160))}%"
-            )
+        # if len(visited) % 10000 == 0:
+        #     print(
+        #         f"Depth: {depth}, Queue: {len(queue)}, "
+        #         f"Visited: {len(visited)}, "
+        #         f"Completed: {int(100*(len(visited)/3674160))}%"
+        #     )
 
         for move_name, turns in MOVES:
             # prune same move on face
@@ -83,7 +85,7 @@ def bfs():
 
             new_state = apply_move(state, move_name, turns)
 
-            if new_state not in visited:
+            if visited.get(new_state) is None:
                 visited[new_state] = depth + 1
 
                 buffer.append(new_state + bytes([depth + 1]))
@@ -96,9 +98,12 @@ def bfs():
     if buffer:
         file.writelines(buffer)
     file.close()
-    return visited
+    end = time.time()
+    return visited, start, end
 
 
-db = bfs()
+db, start, end = bfs()
+with open("time", "a") as f:
+    f.write(f"Time: {round(end-start, 3)}s\n")
 
 
