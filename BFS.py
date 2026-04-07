@@ -13,16 +13,11 @@ cube_class = Cube()
 
 
 MOVES = []
-for m in ["U","D","L","R","F","B"]:
+for m in ["U","R","F"]:
     MOVES.append((m, 1))
     MOVES.append((m + "'", 3))
     MOVES.append((m+"2", 2))
 
-ROTATIONS = cube_class.ROTATIONS
-
-def apply_rotation(state, rotation_map):
-    state=state[:]
-    return [state[i] for i in rotation_map]
 
 def apply_moves(state, move, turns):
     move_map = cube_class.MOVES[move]
@@ -32,22 +27,17 @@ def apply_moves(state, move, turns):
             state[idx] = temp[target]
     return state
 
-def canonical(state):
-    rotated_states = [tuple(apply_rotation(state, rot_map)) for rot_map in ROTATIONS.values()]
-    return min(rotated_states)
 
-
-file = open("cube_db.txt", "a")
 def bfs():
     buffer = []
     BUFFER_SIZE = 10000
 
     initial_state = list(cube_class.INITIAL_STATE)
-    initial_key = canonical(initial_state)
 
     queue = deque([(initial_state, 0, "root")])
-    table = {initial_key: 0}
+    table = {tuple(initial_state): 0}
 
+    file = open("cube_db.txt", "w")
 
     while queue:
         state, depth, prev_move = queue.popleft()
@@ -63,11 +53,11 @@ def bfs():
             base_move = move_name[0]
             new_state = apply_moves(state[:], base_move, turns)
 
-            key= canonical(new_state)
+            key= tuple(new_state)
 
             if key not in table:
                 table[key] = depth + 1
-                buffer.append(f"{key},{depth + 1}\n")
+                buffer.append(f"{"".join(key)},{depth + 1}\n")
 
                 if len(buffer) >= BUFFER_SIZE:
                     file.writelines(buffer)
