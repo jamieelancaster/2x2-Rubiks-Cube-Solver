@@ -22,17 +22,15 @@ COLOR_MAP = {
 
 def draw_face(face, start_x, start_y, size):
     size /= 2
-    cube_face = cube_class.cube[face].copy()
+    faces = cube_class.state_to_face(cube_class.cube)
+    cube_face = faces[face].copy()
     # label = ["0", "1", "2", "3"]
-    if face < 3:
+    if face < 4:
         # label = label[-(face-1):] + label[:-(face-1)]
         cube_face = cube_face[-(face-1):] + cube_face[:-(face-1)]
     if face > 4:
         # label = label[-(face -6):] + label[:-(face -6)]
         cube_face = cube_face[-(face -6):] + cube_face[:-(face -6)]
-    if face == 3:
-        # label = label[::-1]
-        cube_face = cube_face[::-1]
     for i in range(4):
         color = COLOR_MAP[cube_face[i]]
         x1 = start_x + (1 if i==1 or i==2 else 0)*size
@@ -61,53 +59,45 @@ def refresh():
     root.update()
 
 def U(n):
-    cube_class.cube = cube_class.U(n, cube_class.cube)
+    cube_class.apply_move("U", n)
     refresh()
 
 def L(n):
-    cube_class.cube = cube_class.L(n, cube_class.cube)
+    cube_class.apply_move("L", n)
     refresh()
 
 def B(n):
-    cube_class.cube = cube_class.B(n, cube_class.cube)
+    cube_class.apply_move("B", n)
     refresh()
 
 def D(n):
-    cube_class.cube = cube_class.D(n, cube_class.cube)
+    cube_class.apply_move("D", n)
     refresh()
 
 def R(n):
-    cube_class.cube = cube_class.R(n, cube_class.cube)
+    cube_class.apply_move("R", n)
     refresh()
 
 def F(n):
-    cube_class.cube = cube_class.F(n, cube_class.cube)
+    cube_class.apply_move("F", n)
+    refresh()
+
+def x(n):
+    cube_class.rotate("x", n)
+    refresh()
+
+def y(n):
+    cube_class.rotate("y", n)
+    refresh()
+
+def z(n):
+    cube_class.rotate("z", n)
     refresh()
 
 def scramble():
-    scramble = ""
-    for _ in range(20):
-        num = random.randint(1, 6)
-        match num:
-            case 1:
-                U(1)
-                scramble += "U "
-            case 2:
-                L(1)
-                scramble += "L "
-            case 3:
-                B(1)
-                scramble += "B "
-            case 4:
-                D(1)
-                scramble += "D "
-            case 5:
-                R(1)
-                scramble += "R "
-            case 6:
-                F(1)
-                scramble += "F "
-    print(scramble)
+    s = cube_class.scramble()
+    refresh()
+    print(s)
 
 frame = tk.Frame(root)
 frame.pack()
@@ -138,8 +128,15 @@ button.grid(column=1, row=1)
 button = tk.Button(frame, text="F'", command=lambda: F(3))
 button.grid(column=2, row=1)
 
-button = tk.Button(frame, text="scramble", command=scramble)
+button = tk.Button(frame, text="x", command=lambda: x(1))
 button.grid(column=0, row=2)
+button = tk.Button(frame, text="y", command=lambda: y(1))
+button.grid(column=1, row=2)
+button = tk.Button(frame, text="z", command=lambda: z(1))
+button.grid(column=2, row=2)
+
+button = tk.Button(frame, text="scramble", command=scramble)
+button.grid(column=0, row=3)
 
 
 

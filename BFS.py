@@ -1,62 +1,82 @@
 from cube import Cube
-from copy import deepcopy
 from collections import deque
 
-def apply_moves(cube):
-    moves = []
-    for i in range(1, 4):
-        move = [("U", "L", "B", "D", "R", "F"), ("U2", "L2", "B2", "D2", "R2", "F2"), ("U'", "L'", "B'", "D'", "R'", "F'")]
-        moves.append((move[i-1][0], cube_class.U(i, deepcopy(cube))))
-        moves.append((move[i-1][1], cube_class.L(i, deepcopy(cube))))
-        moves.append((move[i-1][2], cube_class.B(i, deepcopy(cube))))
-        moves.append((move[i-1][3], cube_class.D(i, deepcopy(cube))))
-        moves.append((move[i-1][4], cube_class.R(i, deepcopy(cube))))
-        moves.append((move[i-1][5], cube_class.F(i, deepcopy(cube))))
-    return moves
+cube_class = Cube()
+
+# Indices:
+# U: 0–3
+# D: 4–7
+# L: 8–11
+# R: 12–15
+# F: 16–19
+# B: 20–23
 
 
-class Node:
-    def __init__(self, state, depth, move):
-        self.s = state
-        self.d = depth
-        self.m = move
+MOVES = []
+for m in ["U","D","L","R","F","B"]:
+    MOVES.append((m, 1))
+    MOVES.append((m + "'", 3))
+    MOVES.append((m+"2", 2))
+
+ROTATIONS = cube_class.ROTATIONS
+
+def apply_rotation(state, rotation_map):
+    state=state[:]
+    return [state[i] for i in rotation_map]
+
+def apply_moves(state, move, turns):
+    move_map = cube_class.MOVES[move]
+    for _ in range(turns):
+        temp=state[:]
+        for idx, target in enumerate(move_map):
+            state[idx] = temp[target]
+    return state
+
+def canonical(state):
+    rotated_states = [tuple(apply_rotation(state, rot_map)) for rot_map in ROTATIONS.values()]
+    return min(rotated_states)
 
 
+file = open("cube_db.txt", "a")
 def bfs():
-    initial_state = {1: ['Y', 'Y', 'Y', 'Y'], 2: ['R', 'R', 'R', 'R'], 3: ['B', 'B', 'B', 'B'], 4: ['W', 'W', 'W', 'W'], 5: ['O', 'O', 'O', 'O'], 6: ['G', 'G', 'G', 'G']}
-    root_node = deque([Node(initial_state, 0, "root")])
-    visited = set()
-    table = {}
-    while root_node:
-        node = root_node.popleft()
-        print(f"Depth: {node.d}, Queue Size: {len(root_node)}")
-        state_str = cube_class.to_string(node.s)
-        if state_str in visited:
-            continue
-        visited.add(state_str)
+    buffer = []
+    BUFFER_SIZE = 10000
 
-        # apply all moves
-        moves = apply_moves(node.s)
+    initial_state = list(cube_class.INITIAL_STATE)
+    initial_key = canonical(initial_state)
 
-        for move, cube in moves:
-            inverse = {
-                "U":"U'", "U'":"U", "U2":"U2",
-                "L": "L'", "L'": "L", "L2": "L2",
-                "B": "B'", "B'": "B", "B2": "B2",
-                "D": "D'", "D'": "D", "D2": "D2",
-                "R": "R'", "R'": "R", "R2": "R2",
-                "F": "F'", "F'": "F", "F2": "F2",
-            }
-            if move != inverse.get(node.m):
-                new_state_str = cube_class.to_string(cube)
+    queue = deque([(initial_state, 0, "root")])
+    table = {initial_key: 0}
 
-                root_node.append(Node(cube, node.d+1, move))
 
-                if new_state_str not in table:
-                    table[new_state_str] = node.d+1
+    while queue:
+        state, depth, prev_move = queue.popleft()
+        if len(queue) % 10000 == 0:
+            print(f"Depth: {depth}, Queue: {len(queue)}, Visited: {len(table)}, Completed: {int(100*(len(table)/3674160))}%")
+
+        for move_name, turns in MOVES:
+            # prune same move on face
+            if prev_move != "root" and move_name[0] == prev_move[0]:
+                continue
+
+            # treat U2 as U(2), U' as U(3)
+            base_move = move_name[0]
+            new_state = apply_moves(state[:], base_move, turns)
+
+            key= canonical(new_state)
+
+            if key not in table:
+                table[key] = depth + 1
+                buffer.append(f"{key},{depth + 1}\n")
+
+                if len(buffer) >= BUFFER_SIZE:
+                    file.writelines(buffer)
+                    buffer.clear()
+                queue.append((new_state[:], depth+1, move_name))
+    if buffer:
+        file.writelines(buffer)
+    file.close()
     return table
 
 
-cube_class = Cube()
 db = bfs()
-print(db)
