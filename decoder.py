@@ -25,3 +25,5 @@ REVERSE_COLOR_MAP = {
 
 def decode_state(state_bytes):
     return [REVERSE_COLOR_MAP[b] for b in state_bytes]
+
+print(decode_state(read_db("cube_db.bin")))

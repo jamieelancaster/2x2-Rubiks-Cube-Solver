@@ -82,18 +82,6 @@ def F(n):
     cube_class.apply_move("F", n)
     refresh()
 
-def x(n):
-    cube_class.rotate("x", n)
-    refresh()
-
-def y(n):
-    cube_class.rotate("y", n)
-    refresh()
-
-def z(n):
-    cube_class.rotate("z", n)
-    refresh()
-
 def scramble():
     s = cube_class.scramble()
     refresh()
@@ -128,12 +116,6 @@ button.grid(column=1, row=1)
 button = tk.Button(frame, text="F'", command=lambda: F(3))
 button.grid(column=2, row=1)
 
-button = tk.Button(frame, text="x", command=lambda: x(1))
-button.grid(column=0, row=2)
-button = tk.Button(frame, text="y", command=lambda: y(1))
-button.grid(column=1, row=2)
-button = tk.Button(frame, text="z", command=lambda: z(1))
-button.grid(column=2, row=2)
 
 button = tk.Button(frame, text="scramble", command=scramble)
 button.grid(column=0, row=3)
